@@ -1,7 +1,7 @@
 #[derive(serde::Deserialize, Debug)]
 pub struct Story {
     pub by: String,
-    pub descendants: u32,
+    pub descendants: Option<u32>,
     pub id: u32,
     pub kids: Option<Vec<u32>>,
     pub score: u32,
