@@ -1,10 +1,9 @@
-mod hacker_news;
 mod display;
+mod hacker_news;
 
 #[tokio::main]
 async fn main() {
-    let res = hacker_news::api::get::top_stories()
-        .await;
+    let res = hacker_news::api::get::top_stories().await;
 
     let top_stories = res.unwrap();
 
@@ -13,8 +12,7 @@ async fn main() {
     let mut count = 0;
     for id in top_stories {
         if count < 10 {
-            let story = hacker_news::api::get::story(id)
-                .await;
+            let story = hacker_news::api::get::story(id).await;
             stories.push(story.unwrap());
         }
         count += 1;
