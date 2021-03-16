@@ -1,5 +1,6 @@
 #[allow(dead_code)]
 mod util;
+mod logging;
 mod hackernews;
 
 use crate::util::{
@@ -24,6 +25,8 @@ async fn main() -> Result<(), Box<dyn Error>>{
     let stdout = AlternateScreen::from(stdout);
     let backend = TermionBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
+
+    crate::logging::init_logging();
 
     // Get initial front page links
     let top_stories = match hackernews::top_stories(10 as usize).await {
