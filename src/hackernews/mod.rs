@@ -1,27 +1,31 @@
 #[derive(serde::Deserialize, Debug)]
 pub struct Story {
+    #[serde(default)]
     pub by: String,
+
+    #[serde(default)]
     pub descendants: i32,
+
+    #[serde(default)]
     pub id: i32,
 
-    #[serde(default = "default_vec")]
+    #[serde(default)]
     pub kids: Vec<i32>,
 
+    #[serde(default)]
     pub score: i32,
+
+    #[serde(default)]
     pub time: u32,
+
+    #[serde(default)]
     pub title: String,
+
+    #[serde(default)]
     pub r#type: String,
 
-    #[serde(default = "default_string")]
+    #[serde(default)]
     pub url: String
-}
-
-fn default_vec() -> Vec<i32> {
-    Vec::new()
-}
-
-fn default_string() -> String {
-    String::new()
 }
 
 pub async fn top_stories(max_stories: usize) -> Result<Vec<Story>, Box<dyn std::error::Error>> {
