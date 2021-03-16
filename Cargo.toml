@@ -1,5 +1,5 @@
 [package]
-name = "hackernews-cli"
+name = "hackernews-tui"
 version = "0.1.0"
 authors = ["sgiroux <sgiroux@c3metrics.com>"]
 edition = "2018"
@@ -7,9 +7,11 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-reqwest = { version = "0.10", features = ["blocking", "json"] }
-tokio = { version = "0.2", features = ["full"] }
-futures = "0.3.4"
+rand = "0.7"
+reqwest = { version = "0.11", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0" }
-colored = "1.9"
+termion = "1.5"
+tokio = { version = "1", features = ["full"] }
+tui = "0.14"
+webbrowser = "0.5.5"
