@@ -43,7 +43,6 @@ async fn main() -> Result<(), Box<dyn Error>>{
             let items: Vec<ListItem> = stateful_list
                 .items
                 .iter()
-                .rev()
                 .map(|data| {
                     let title = Spans::from(vec![
                         Span::styled(

@@ -135,13 +135,7 @@ impl StatefulList {
 
     pub fn select(&mut self) {
         let i = match self.state.selected() {
-            Some(i) => {
-                if i == 0 {
-                    self.items.len() - 1
-                } else {
-                    i - 1
-                }
-            },
+            Some(i) => i,
             None => 0
         };
 
