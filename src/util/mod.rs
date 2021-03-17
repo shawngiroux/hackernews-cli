@@ -3,6 +3,7 @@ pub mod event;
 use tui::widgets::ListState;
 use webbrowser;
 use crate::hackernews::Story;
+use crate::hackernews::Comment;
 
 
 #[derive(Debug)]
@@ -69,4 +70,81 @@ impl StatefulList {
         let selected_items = &self.items[i];
         webbrowser::open(&selected_items.url).unwrap();
     }
+
+    pub fn get_comments(&mut self) -> Vec<i32>{
+        let i = match self.state.selected() {
+            Some(i) => i,
+            None => 0
+        };
+
+        self.items[i].kids.to_vec()
+    }
+
+}
+
+
+#[derive(Debug)]
+pub struct CommentStatefulList {
+    pub state: ListState,
+    pub items: Vec<Comment>,
+}
+
+impl CommentStatefulList {
+    pub fn new() -> CommentStatefulList {
+        CommentStatefulList {
+            state: ListState::default(),
+            items: Vec::new(),
+        }
+    }
+
+    pub fn with_items(items: Vec<Comment>) -> CommentStatefulList {
+        let mut list = CommentStatefulList {
+            state: ListState::default(),
+            items,
+        };
+        list.state.select(Some(0));
+        list
+    }
+
+    pub fn next(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i >= self.items.len() - 1 {
+                    0
+                } else {
+                    i + 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
+    }
+
+    pub fn previous(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i == 0 {
+                    self.items.len() - 1
+                } else {
+                    i - 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
+    }
+
+    pub fn unselect(&mut self) {
+        self.state.select(None);
+    }
+
+    pub fn get_comments(&mut self) -> Vec<i32>{
+        let i = match self.state.selected() {
+            Some(i) => i,
+            None => 0
+        };
+
+        self.items[i].kids.to_vec()
+    }
+
 }
