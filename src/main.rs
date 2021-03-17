@@ -3,7 +3,6 @@ mod util;
 mod logging;
 mod hackernews;
 
-use futures::executor::block_on;
 use crate::util::{
     event::{Event, Events},
     StatefulList,
@@ -100,29 +99,60 @@ fn main() -> Result<(), Box<dyn Error>>{
                         .items
                         .iter()
                         .map(|comment| {
-                            let msg = Spans::from(vec![
-                                Span::styled(
-                                    format!("{}", comment.text),
-                                    Style::default()
-                                )
-                            ]);
+                            let mut list_item: Vec<Spans> = vec![];
+
+                            // Width of terminal
+                            let width = size.width as usize;
+
+                            // Decoding any html characters for easier reading
+                            let text = match htmlescape::decode_html(&comment.text) {
+                                Ok(text) => text,
+                                Err(error) => panic!("{:?}", error)
+                            };
+
+                            // Wrapping minus a width of 5 to hopefully offset the
+                            // highlight characters and borders
+                            let text = textwrap::fill(&text, width-5);
+
+                            // Pushing the string splits into the display vector
+                            for s in text.split('\n') {
+                                let item = Spans::from(vec![
+                                    Span::styled(
+                                        format!("{}", s),
+                                        Style::default()
+                                    )
+                                ]);
+                                list_item.push(item);
+                            }
+
+                            // Name of user who published a comment
                             let user = Spans::from(vec![
                                 Span::styled(
                                     format!("By: {}", comment.by),
                                     Style::default()
                                 )
                             ]);
-                            ListItem::new(vec![
-                                msg,
-                                user,
-                                Spans::from("")
-                            ])
-                        }).
-                    collect();
+
+                            // Final pushes for display vector
+                            list_item.push(user);
+                            list_item.push(Spans::from(""));
+
+                            ListItem::new(list_item)
+                        })
+                    .collect();
 
                     // Creating the list for rendering
                     let items_list = List::new(items)
-                        .block(Block::default().borders(Borders::ALL).title("Comments"))
+                        .block(
+                            Block::default()
+                            .borders(Borders::ALL)
+                            .title(
+                                Span::styled("Comments",
+                                    Style::default()
+                                    .add_modifier(Modifier::BOLD),
+                                )
+                            )
+                        )
                         .highlight_style(
                             Style::default()
                             .fg(Color::LightYellow)
@@ -132,10 +162,6 @@ fn main() -> Result<(), Box<dyn Error>>{
 
                     // Rendering list data
                     f.render_stateful_widget(items_list, size, &mut comment_list.state);
-                    let comments = Block::default()
-                        .title("Comments")
-                        .borders(Borders::ALL);
-                    f.render_widget(comments, size);
                 }
             }
         })?;
