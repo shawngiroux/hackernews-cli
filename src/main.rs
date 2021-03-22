@@ -105,6 +105,8 @@ async fn main() -> Result<(), Box<dyn Error>>{
                             // Width of terminal
                             let width = size.width as usize;
 
+                            let depth_buffer = "    ".repeat(comment.depth as usize);
+
                             // Decoding any html characters for easier reading
                             let text = match htmlescape::decode_html(&comment.text) {
                                 Ok(text) => text,
@@ -113,13 +115,13 @@ async fn main() -> Result<(), Box<dyn Error>>{
 
                             // Wrapping minus a width of 5 to hopefully offset the
                             // highlight characters and borders
-                            let text = textwrap::fill(&text, width-5);
+                            let text = textwrap::fill(&text, width-5 + (comment.depth * 4) as usize);
 
                             // Pushing the string splits into the display vector
                             for s in text.split('\n') {
                                 let item = Spans::from(vec![
                                     Span::styled(
-                                        format!("{}", s),
+                                        format!("{}{}", depth_buffer, s),
                                         Style::default()
                                     )
                                 ]);
@@ -129,7 +131,7 @@ async fn main() -> Result<(), Box<dyn Error>>{
                             // Name of user who published a comment
                             let user = Spans::from(vec![
                                 Span::styled(
-                                    format!("By: {}", comment.by),
+                                    format!("{}By: {}", depth_buffer, comment.by),
                                     Style::default()
                                 )
                             ]);
@@ -177,10 +179,11 @@ async fn main() -> Result<(), Box<dyn Error>>{
                         Key::Char('c') => {
                             // Retrieve comment parents from selected story
                             let comment_parents = stateful_list.get_comments();
-                            let comments = match hackernews::get_comments(comment_parents).await {
+                            let comments = match hackernews::get_comments(&comment_parents, 0).await {
                                 Ok(x) => x,
                                 Err(error) => panic!("{}", error)
                             };
+                            let comments = hackernews::flatten_comments(&comments);
 
                             for comment in comments {
                                 comment_list.items.push(comment);
