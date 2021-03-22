@@ -58,10 +58,11 @@ async fn main() -> Result<(), Box<dyn Error>>{
                     let items: Vec<ListItem> = stateful_list
                         .items
                         .iter()
-                        .map(|data| {
+                        .enumerate()
+                        .map(|(i, data)| {
                             let title = Spans::from(vec![
                                 Span::styled(
-                                    format!("{}", data.title),
+                                    format!("{}) {}", i + 1, data.title),
                                     Style::default()
                                 )
                             ]);
@@ -121,7 +122,7 @@ async fn main() -> Result<(), Box<dyn Error>>{
                             for s in text.split('\n') {
                                 let item = Spans::from(vec![
                                     Span::styled(
-                                        format!("{}{}", depth_buffer, s),
+                                        format!("{}| {}", depth_buffer, s),
                                         Style::default()
                                     )
                                 ]);
@@ -131,7 +132,7 @@ async fn main() -> Result<(), Box<dyn Error>>{
                             // Name of user who published a comment
                             let user = Spans::from(vec![
                                 Span::styled(
-                                    format!("{}By: {}", depth_buffer, comment.by),
+                                    format!("{}| By: {}", depth_buffer, comment.by),
                                     Style::default()
                                 )
                             ]);

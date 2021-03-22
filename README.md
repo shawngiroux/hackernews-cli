@@ -8,9 +8,19 @@ $ cargo run
 ```
 
 ## Controls
+
+### Stories panel:
 ```
+q: quit
 k: traverse up
 j: traverse down
 enter: open story in default browser
 c: open comments for story
+```
+
+### Comments panel:
+```
+q: go back
+k: traverse up
+j: traverse down
 ```

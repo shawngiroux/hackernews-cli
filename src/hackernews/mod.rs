@@ -130,7 +130,12 @@ pub async fn get_comments(comment_parents: &Vec<i32>, depth: i32) -> Result<Vec<
     let mut futures = futures::future::join_all(comments_futures).await;
 
     for comment in &mut futures {
-            comment.depth = depth;
+        // Unsure why, but occasionally we are getting empty users
+        if comment.by == "" {
+            continue;
+        }
+
+        comment.depth = depth;
         if comment.kids.len() > 0 {
             let depth = depth + 1;
             let kid_comments = get_comments(&comment.kids, depth).await;
