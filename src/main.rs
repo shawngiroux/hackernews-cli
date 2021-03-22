@@ -23,7 +23,8 @@ enum AppState {
     Comments
 }
 
-fn main() -> Result<(), Box<dyn Error>>{
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>>{
     // Create Terminal
     let stdout = io::stdout().into_raw_mode()?;
     let stdout = MouseTerminal::from(stdout);
@@ -34,7 +35,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     crate::logging::init_logging();
 
     // Get initial front page links
-    let top_stories = match hackernews::top_stories(15 as usize) {
+    let top_stories = match hackernews::top_stories(25 as usize).await {
         Ok(x) => x,
         Err(error) => panic!("{}", error)
     };
@@ -176,14 +177,12 @@ fn main() -> Result<(), Box<dyn Error>>{
                         Key::Char('c') => {
                             // Retrieve comment parents from selected story
                             let comment_parents = stateful_list.get_comments();
+                            let comments = match hackernews::get_comments(comment_parents).await {
+                                Ok(x) => x,
+                                Err(error) => panic!("{}", error)
+                            };
 
-                            for comment_id in comment_parents {
-                                let comment = hackernews::get_comments(comment_id);
-                                let comment = match comment {
-                                    Ok(x) => x,
-                                    Err(error) => panic!("{}", error)
-                                };
-
+                            for comment in comments {
                                 comment_list.items.push(comment);
                                 comment_list.state.select(Some(0));
                             }

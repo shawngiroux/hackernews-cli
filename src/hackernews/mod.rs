@@ -52,33 +52,63 @@ pub struct Comment {
     pub r#type: String
 }
 
-pub fn top_stories(max_stories: usize) -> Result<Vec<Story>, Box<dyn std::error::Error>> {
+async fn get_story(story_id: u32) -> Story {
+    reqwest::get(format!("https://hacker-news.firebaseio.com/v0/item/{}.json", story_id))
+        .await
+        .unwrap()
+        .json::<Story>()
+        .await
+        .unwrap()
+}
+
+pub async fn top_stories(max_stories: usize) -> Result<Vec<Story>, Box<dyn std::error::Error>> {
     let mut top_stories: Vec<Story> = Vec::new();
 
-    let resp = reqwest::blocking::get("https://hacker-news.firebaseio.com/v0/topstories.json")?
+    let resp = reqwest::get("https://hacker-news.firebaseio.com/v0/topstories.json")
+        .await?
         .json::<Vec<u32>>()
-        .unwrap();
+        .await?;
 
+    let mut story_futures = Vec::new();
     for (i, story_id) in resp.iter().enumerate() {
         if i == max_stories {
             break;
         }
+        let story = get_story(*story_id);
+        story_futures.push(story)
+    }
+    let stories = futures::future::join_all(story_futures).await;
 
-        let story = reqwest::blocking::get(format!("https://hacker-news.firebaseio.com/v0/item/{}.json", *story_id))?
-            .json::<Story>()
-            .unwrap();
-
-        top_stories.push(story)
+    for story in stories {
+        top_stories.push(story);
     }
 
     Ok(top_stories)
 }
 
-pub fn get_comments(comment_id: i32) -> Result<Comment, Box<dyn std::error::Error>> {
-    log::info!("Getting comment for: {}", comment_id);
-    let comment = reqwest::blocking::get(format!("https://hacker-news.firebaseio.com/v0/item/{}.json", comment_id))?
+async fn get_comment(comment_id: i32) -> Comment {
+    reqwest::get(format!("https://hacker-news.firebaseio.com/v0/item/{}.json", comment_id))
+        .await
+        .unwrap()
         .json::<Comment>()
-        .unwrap();
-    log::info!("Getting comment for: {}", comment_id);
-    Ok(comment)
+        .await
+        .unwrap()
+}
+
+pub async fn get_comments(comment_parents: Vec<i32>) -> Result<Vec<Comment>, Box<dyn std::error::Error>> {
+    let mut comments: Vec<Comment> = Vec::new();
+
+    let mut comments_futures = Vec::new();
+    for comment_id in comment_parents {
+        let comment = get_comment(comment_id);
+        comments_futures.push(comment);
+    }
+
+    let futures = futures::future::join_all(comments_futures).await;
+
+    for comment in futures {
+        comments.push(comment);
+    }
+
+    Ok(comments)
 }
