@@ -82,7 +82,16 @@ async fn main() -> Result<(), Box<dyn Error>>{
 
                     // Creating the list for rendering
                     let items_list = List::new(items)
-                        .block(Block::default().borders(Borders::ALL).title("Top Stories"))
+                        .block(
+                            Block::default()
+                            .borders(Borders::ALL)
+                            .title(
+                                Span::styled(" Top Stories ",
+                                    Style::default()
+                                    .add_modifier(Modifier::BOLD),
+                                )
+                            )
+                        )
                         .highlight_style(
                             Style::default()
                             .fg(Color::LightYellow)
@@ -106,7 +115,7 @@ async fn main() -> Result<(), Box<dyn Error>>{
                             // Width of terminal
                             let width = size.width as usize;
 
-                            let depth_buffer = "    ".repeat(comment.depth as usize);
+                            let depth_buffer = "  ".repeat(comment.depth as usize);
 
                             // Decoding any html characters for easier reading
                             let text = match htmlescape::decode_html(&comment.text) {
@@ -114,9 +123,13 @@ async fn main() -> Result<(), Box<dyn Error>>{
                                 Err(error) => panic!("{:?}", error)
                             };
 
-                            // Wrapping minus a width of 5 to hopefully offset the
-                            // highlight characters and borders
-                            let text = textwrap::fill(&text, width-5 + (comment.depth * 4) as usize);
+                            // Wrapping minus a width of 7 to hopefully offset the
+                            // highlight characters and borders and pipe delimiter
+                            //
+                            // It's not ideal to continue adding to this math, and a
+                            // better way should be written into the inevitable refactor
+                            // of generating these interfaces.
+                            let text = textwrap::fill(&text, (width - 7) - (comment.depth * 2) as usize);
 
                             // Pushing the string splits into the display vector
                             for s in text.split('\n') {
@@ -151,7 +164,7 @@ async fn main() -> Result<(), Box<dyn Error>>{
                             Block::default()
                             .borders(Borders::ALL)
                             .title(
-                                Span::styled("Comments",
+                                Span::styled(" Comments ",
                                     Style::default()
                                     .add_modifier(Modifier::BOLD),
                                 )
