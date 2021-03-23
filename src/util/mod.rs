@@ -79,7 +79,6 @@ impl StatefulList {
 
         self.items[i].kids.to_vec()
     }
-
 }
 
 
@@ -120,6 +119,20 @@ impl CommentStatefulList {
         self.state.select(Some(i));
     }
 
+    pub fn next_parent(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => i,
+            None => 0,
+        };
+
+        for (index, comment) in self.items.iter().enumerate() {
+            if index > i && comment.depth == 0 {
+                self.state.select(Some(index));
+                break;
+            }
+        }
+    }
+
     pub fn previous(&mut self) {
         let i = match self.state.selected() {
             Some(i) => {
@@ -132,6 +145,24 @@ impl CommentStatefulList {
             None => 0,
         };
         self.state.select(Some(i));
+    }
+
+    pub fn previous_parent(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => i,
+            None => 0,
+        };
+
+        for (index, comment) in self.items.iter().rev().enumerate() {
+            // Creating inverse mimic original index with reversed array
+            let inverse_index: i32 = (index as i32) - (self.items.len() - 1) as i32;
+            let inverse_index = inverse_index.abs() as usize;
+
+            if inverse_index < i && comment.depth == 0 {
+                self.state.select(Some(inverse_index));
+                break;
+            }
+        }
     }
 
     pub fn unselect(&mut self) {

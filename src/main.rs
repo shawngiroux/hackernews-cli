@@ -218,8 +218,14 @@ async fn main() -> Result<(), Box<dyn Error>>{
                         Key::Char('j') => {
                             comment_list.next();
                         }
+                        Key::Char('J') => {
+                            comment_list.next_parent();
+                        }
                         Key::Char('k') => {
                             comment_list.previous();
+                        }
+                        Key::Char('K') => {
+                            comment_list.previous_parent();
                         }
                         _ => {}
                     },

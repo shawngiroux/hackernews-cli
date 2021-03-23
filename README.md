@@ -22,5 +22,7 @@ c: open comments for story
 ```
 q: go back
 k: traverse up
+K: traverse to previous parent comment
 j: traverse down
+J: traverse to next parent comment
 ```
