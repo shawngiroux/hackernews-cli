@@ -25,4 +25,6 @@ k: traverse up
 K: traverse to previous parent comment
 j: traverse down
 J: traverse to next parent comment
+g: go to top of comments
+G: go to bottom of comments
 ```

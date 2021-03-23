@@ -227,6 +227,12 @@ async fn main() -> Result<(), Box<dyn Error>>{
                         Key::Char('K') => {
                             comment_list.previous_parent();
                         }
+                        Key::Char('g') => {
+                            comment_list.go_to_top();
+                        }
+                        Key::Char('G') => {
+                            comment_list.go_to_bottom();
+                        }
                         _ => {}
                     },
 
