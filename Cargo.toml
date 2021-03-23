@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 async-recursion="0.3.2"
+crossclip = "0.7.0"
 futures = "0.3"
 htmlescape = "0.3.1"
 log = "0.4.6"

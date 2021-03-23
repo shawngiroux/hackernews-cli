@@ -27,4 +27,5 @@ j: traverse down
 J: traverse to next parent comment
 g: go to top of comments
 G: go to bottom of comments
+y: yank comment text to clipboard
 ```

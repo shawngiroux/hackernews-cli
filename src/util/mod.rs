@@ -1,3 +1,5 @@
+use crossclip::{Clipboard, SystemClipboard};
+
 pub mod event;
 
 use tui::widgets::ListState;
@@ -184,5 +186,17 @@ impl CommentStatefulList {
 
     pub fn go_to_bottom(&mut self) {
         self.state.select(Some(self.items.len() - 1));
+    }
+
+    pub fn copy_text_to_clipboard(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => i,
+            None => 0
+        };
+
+        let comment = &self.items[i];
+
+        let clipboard = SystemClipboard::new().unwrap();
+        clipboard.set_string_contents(String::from(&comment.text)).unwrap();
     }
 }

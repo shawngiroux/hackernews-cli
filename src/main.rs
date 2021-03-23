@@ -246,6 +246,9 @@ async fn main() -> Result<(), Box<dyn Error>>{
                         Key::Char('G') => {
                             comment_list.go_to_bottom();
                         }
+                        Key::Char('y') => {
+                            comment_list.copy_text_to_clipboard();
+                        }
                         _ => {}
                     },
 
