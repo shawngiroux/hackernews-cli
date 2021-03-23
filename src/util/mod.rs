@@ -4,8 +4,8 @@ pub mod event;
 
 use tui::widgets::ListState;
 use webbrowser;
-use crate::hackernews::Story;
-use crate::hackernews::Comment;
+use crate::hackernews::stories::Story;
+use crate::hackernews::comments::Comment;
 
 
 #[derive(Debug)]

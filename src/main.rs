@@ -35,7 +35,7 @@ async fn main() -> Result<(), Box<dyn Error>>{
     crate::logging::init_logging();
 
     // Get initial front page links
-    let top_stories = match hackernews::top_stories(25 as usize).await {
+    let top_stories = match hackernews::stories::top_stories(25 as usize).await {
         Ok(x) => x,
         Err(error) => panic!("{}", error)
     };
@@ -193,11 +193,11 @@ async fn main() -> Result<(), Box<dyn Error>>{
                         Key::Char('c') => {
                             // Retrieve comment parents from selected story
                             let comment_parents = stateful_list.get_comments();
-                            let comments = match hackernews::get_comments(&comment_parents, 0).await {
+                            let comments = match hackernews::comments::get_comments(&comment_parents, 0).await {
                                 Ok(x) => x,
                                 Err(error) => panic!("{}", error)
                             };
-                            let comments = hackernews::flatten_comments(&comments);
+                            let comments = hackernews::comments::flatten_comments(&comments);
 
                             for comment in comments {
                                 comment_list.items.push(comment);
