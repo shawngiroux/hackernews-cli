@@ -117,19 +117,13 @@ async fn main() -> Result<(), Box<dyn Error>>{
 
                             let depth_buffer = "  ".repeat(comment.depth as usize);
 
-                            // Decoding any html characters for easier reading
-                            let text = match htmlescape::decode_html(&comment.text) {
-                                Ok(text) => text,
-                                Err(error) => panic!("{:?}", error)
-                            };
-
                             // Wrapping minus a width of 7 to hopefully offset the
                             // highlight characters and borders and pipe delimiter
                             //
                             // It's not ideal to continue adding to this math, and a
                             // better way should be written into the inevitable refactor
                             // of generating these interfaces.
-                            let text = textwrap::fill(&text, (width - 7) - (comment.depth * 2) as usize);
+                            let text = textwrap::fill(&comment.text, (width - 7) - (comment.depth * 2) as usize);
 
                             // Pushing the string splits into the display vector
                             for s in text.split('\n') {

@@ -1,3 +1,5 @@
+use regex::Regex;
+
 #[derive(serde::Deserialize, Debug, Clone)]
 pub struct Comment {
     #[serde(default)]
@@ -71,6 +73,10 @@ pub async fn get_comments(comment_parents: &Vec<i32>, depth: i32) -> Result<Vec<
             continue;
         }
 
+        // Cleaning up string to displaying purposes
+        comment.text = decode_comments(&comment.text);
+        comment.text = remove_html_tags(&comment.text);
+
         comment.depth = depth;
         if comment.kids.len() > 0 {
             let depth = depth + 1;
@@ -85,4 +91,43 @@ pub async fn get_comments(comment_parents: &Vec<i32>, depth: i32) -> Result<Vec<
     }
 
     Ok(comments)
+}
+
+fn remove_html_tags(text: &str) -> String {
+    // Removing paragraph tags which typically seem to appear immediately after a period
+    let re = Regex::new(r"<[p].*?>").unwrap();
+    let mut text = re.replace_all(text, " ").to_string();
+
+    // Removing anchor tags an inserting the full url
+    let mut urls = Vec::new();
+    let mut urls_to_replace = Vec::new();
+
+    // Extracting urls that we will use for replacement
+    for mat in Regex::new("\"(http|https).*?\"").unwrap().find_iter(&text) {
+        let url = text[mat.start()..mat.end()]
+            .to_string()
+            .replace("\"", "");
+        urls.push(url);
+    }
+
+    // Finding any anchor tags that we will replace
+    for mat in Regex::new(r"<a.*?/a>").unwrap().find_iter(&text) {
+        let replace_val = text[mat.start()..mat.end()]
+            .to_string();
+        urls_to_replace.push(replace_val);
+    }
+
+    // Replacing the anchor tags with the links
+    for (i, url) in urls_to_replace.iter().enumerate() {
+        text = text.replace(url, &urls[i]);
+    }
+
+    text
+}
+
+fn decode_comments(text: &str) -> String {
+    match htmlescape::decode_html(text) {
+        Ok(text) => text,
+        Err(error) => panic!("{:?}", error)
+    }
 }
