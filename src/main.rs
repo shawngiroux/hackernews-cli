@@ -208,6 +208,13 @@ async fn main() -> Result<(), Box<dyn Error>>{
                         Key::Char('\n') => {
                             stateful_list.select();
                         }
+                        Key::Char('r') => {
+                            let top_stories = match hackernews::stories::top_stories(25 as usize).await {
+                                Ok(x) => x,
+                                Err(error) => panic!("{}", error)
+                            };
+                            stateful_list = StatefulList::with_items(top_stories);
+                        }
                         _ => {}
                     },
 
