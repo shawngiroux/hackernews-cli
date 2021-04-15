@@ -3,11 +3,17 @@ mod util;
 mod logging;
 mod hackernews;
 
-use crate::util::{
-    event::{Event, Events},
-    StatefulList,
-    CommentStatefulList
+use crate::{
+    util::{
+        event::{Event, Events},
+        StatefulList
+    },
+    hackernews::{
+        stories::Story,
+        comments::Comment
+    }
 };
+
 use std::{error::Error, io};
 use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
 use tui::{
@@ -40,8 +46,8 @@ async fn main() -> Result<(), Box<dyn Error>>{
         Err(error) => panic!("{}", error)
     };
 
-    let mut stateful_list = StatefulList::with_items(top_stories);
-    let mut comment_list = CommentStatefulList::new();
+    let mut stateful_list = StatefulList::<Story>::with_items(top_stories);
+    let mut comment_list = StatefulList::<Comment>::new();
 
     let mut events = Events::new();
     events.disable_exit_key();
@@ -232,7 +238,7 @@ async fn main() -> Result<(), Box<dyn Error>>{
                 match events.next()? {
                     Event::Input(input) => match input {
                         Key::Char('q') => {
-                            comment_list = CommentStatefulList::new();
+                            comment_list = StatefulList::<Comment>::new();
                             current_state = AppState::Stories;
                         }
                         Key::Char('j') => {

@@ -9,20 +9,20 @@ use crate::hackernews::comments::Comment;
 
 
 #[derive(Debug)]
-pub struct StatefulList {
+pub struct StatefulList<T> {
     pub state: ListState,
-    pub items: Vec<Story>,
+    pub items: Vec<T>,
 }
 
-impl StatefulList {
-    pub fn new() -> StatefulList {
+impl<T> StatefulList<T> {
+    pub fn new() -> StatefulList<T> {
         StatefulList {
             state: ListState::default(),
             items: Vec::new(),
         }
     }
 
-    pub fn with_items(items: Vec<Story>) -> StatefulList {
+    pub fn with_items(items: Vec<T>) -> StatefulList<T> {
         let mut list = StatefulList {
             state: ListState::default(),
             items,
@@ -59,10 +59,16 @@ impl StatefulList {
         self.state.select(Some(i));
     }
 
-    pub fn unselect(&mut self) {
-        self.state.select(None);
+    pub fn go_to_top(&mut self) {
+        self.state.select(Some(0));
     }
 
+    pub fn go_to_bottom(&mut self) {
+        self.state.select(Some(self.items.len() - 1));
+    }
+}
+
+impl StatefulList<Story> {
     pub fn select(&mut self) {
         let i = match self.state.selected() {
             Some(i) => i,
@@ -81,54 +87,9 @@ impl StatefulList {
 
         self.items[i].kids.to_vec()
     }
-
-    pub fn go_to_top(&mut self) {
-        self.state.select(Some(0));
-    }
-
-    pub fn go_to_bottom(&mut self) {
-        self.state.select(Some(self.items.len() - 1));
-    }
 }
 
-
-#[derive(Debug)]
-pub struct CommentStatefulList {
-    pub state: ListState,
-    pub items: Vec<Comment>,
-}
-
-impl CommentStatefulList {
-    pub fn new() -> CommentStatefulList {
-        CommentStatefulList {
-            state: ListState::default(),
-            items: Vec::new(),
-        }
-    }
-
-    pub fn with_items(items: Vec<Comment>) -> CommentStatefulList {
-        let mut list = CommentStatefulList {
-            state: ListState::default(),
-            items,
-        };
-        list.state.select(Some(0));
-        list
-    }
-
-    pub fn next(&mut self) {
-        let i = match self.state.selected() {
-            Some(i) => {
-                if i >= self.items.len() - 1 {
-                    0
-                } else {
-                    i + 1
-                }
-            }
-            None => 0,
-        };
-        self.state.select(Some(i));
-    }
-
+impl StatefulList<Comment> {
     pub fn next_parent(&mut self) {
         let i = match self.state.selected() {
             Some(i) => i,
@@ -141,20 +102,6 @@ impl CommentStatefulList {
                 break;
             }
         }
-    }
-
-    pub fn previous(&mut self) {
-        let i = match self.state.selected() {
-            Some(i) => {
-                if i == 0 {
-                    self.items.len() - 1
-                } else {
-                    i - 1
-                }
-            }
-            None => 0,
-        };
-        self.state.select(Some(i));
     }
 
     pub fn previous_parent(&mut self) {
@@ -173,27 +120,6 @@ impl CommentStatefulList {
                 break;
             }
         }
-    }
-
-    pub fn unselect(&mut self) {
-        self.state.select(None);
-    }
-
-    pub fn get_comments(&mut self) -> Vec<i32>{
-        let i = match self.state.selected() {
-            Some(i) => i,
-            None => 0
-        };
-
-        self.items[i].kids.to_vec()
-    }
-
-    pub fn go_to_top(&mut self) {
-        self.state.select(Some(0));
-    }
-
-    pub fn go_to_bottom(&mut self) {
-        self.state.select(Some(self.items.len() - 1));
     }
 
     pub fn copy_text_to_clipboard(&mut self) {
