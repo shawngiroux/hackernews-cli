@@ -81,6 +81,14 @@ impl StatefulList {
 
         self.items[i].kids.to_vec()
     }
+
+    pub fn go_to_top(&mut self) {
+        self.state.select(Some(0));
+    }
+
+    pub fn go_to_bottom(&mut self) {
+        self.state.select(Some(self.items.len() - 1));
+    }
 }
 
 
