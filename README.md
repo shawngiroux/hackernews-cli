@@ -19,6 +19,8 @@ k: traverse up
 j: traverse down
 enter: open story in default browser
 c: open comments for story
+g: go to top of stories
+G: go to bottom of stories
 ```
 
 ### Comments panel:
