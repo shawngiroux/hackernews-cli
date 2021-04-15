@@ -1,4 +1,7 @@
 # hackernews-tui
+
+![Screenshot from 2021-04-02 09-52-15](https://user-images.githubusercontent.com/29616627/113421471-28e04d80-9399-11eb-8bbc-f8db9846756c.png)
+
 This project is certainly a work in process to familiarize myself with Rust and creating terminal user interface.
 
 ## Running
